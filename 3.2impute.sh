@@ -16,7 +16,6 @@ annotref_file=~/Ref/chrpostors/snp150_hg19.txt
 
 geno_thresh=0.03
 maf_thresh=0.01
-hwe_thresh=1e-10
 
 imp_dir=${work_dir}/3_imp
 mkdir -p ${imp_dir}
@@ -58,7 +57,6 @@ done
 
 ${plink_dir}/plink --bfile ${bfilename}_imputed_chr1_info08 \
 --merge-list ${bfilename}_mergelist.txt \
---hwe ${hwe_thresh} \
 --maf ${maf_thresh} \
 --geno ${geno_thresh} \
 --snps-only just-acgt \
