@@ -123,20 +123,44 @@ By checking the information in the files, We found that the population was divid
 There are many different ways to select the number of principal components, one of which can be through the p-value of Tracy-Widom statistics, for example here we select the first 5 principal components. This step  generates a file of covariates and excludes individuals outside of 6 standard deviations at the same time.
 
 # Phase & Impute
-
+---
 The template and processing of eagle can be referred to the official website, which also mentions that if your sample is twice as large as the template ,the reference is not necessary.
 
 Minimac4 reference can be downloaded from the official website.
 
 After Imputation, similar to the SNPs QC above, quality control and annotation of SNPs is still required. INFO represents the quality of impute, generally choose INFO>0.8
 # Association Analysis
-
+---
 If it is a binary variable use `--logistic`, if it is a continuous variable use `--linear`, if there are covariates you can add `hide-covar` after, otherwise  each covariate will be calculated separately, and the final generated file will be very large.
 
 Manhattan plot without going into detail, you can use CMplot (https://github.com/YinLiLin/CMplot), you can also refer to ggplot2 Manhattan drawing tutorials. The main difficulty in plotting using ggplot2 is how to determine the x-axis based on chromosome length, which is addressed in this tutorial(https://r-graph-gallery.com/101_Manhattan_plot.html), `Manhattan` package can not adjust the color so it is not beautiful enough.
 # PRS
+---
+Currently commonly used PRS calculation tools include plink, PRSice2, lassosum and PRS-cs. You can see the tutorials for more details.
 
-...
+plink/PRSice2/lassosum: https://choishingwan.github.io/PRS-Tutorial/
+PRS-cs: https://github.com/getian107/PRScs
+
+## QC of Base Data
+
+First, use the `format_summary.py` to standardized file column names, It is mainly identified by the pairing in the json file, so you may need to modify the file in the json. If you need N and there is no N in the file, you can use a command like `--n_num` or `--nca_num` `--nco_num` to specify it.
+
+The first thing to pay attention to is the gene structure. If necessary, use `liftover` to convert it.
+
+We can just do Base Data QC follwing the tutorial (https://choishingwan.github.io/PRS-Tutorial/). As for palindromic SNPs, in the tutotial which is called "Ambiguous SNPs"， you can just remove it as the tutorial do, or you can just remove these ambiguous SNPs whose `Frq` ranges from 0.4-0.6. And then compare the `Frq` with your target data to match SNPs.
+
+## QC between base and target data
+
+Because we have already conducted complete quality control of target data during the GWAS process. Therefore, in this part we only conduct quality control between base and target. We can also follow the above tutorial. 
+
+The most important of which is the `Mismatch SNPs`. As the tutorial introduced,  most PRS software will perform strand-flipping automatically, thus this step is usually not required. But if we were to do this step ourselves, I think there might be something missing from the tutorial. `plink --a1-allele` can only solve the complementary problem, but not the recode and recoding & complement problems. We need to separate these SNPs and use --flip and --a1-allele to solve. Chain flipping has been done in our GWAS quality control, so theoretically there should be very few SNPs for these two types.
+
+## Calculate the PRS
+
+Our data is about depression. If we later want to calculate the correlation between PRS and a indicator, we can first see what p-value threshold to calculate PRS is most appropriate between our own case and control, and then follow this threshold is used to calculate the PRS for the next step of analysis.
+
+Or, we directly use PRScs-auto to estimate our PRS. Only these two methods are described here. The ubsequent correlation analysis will not be described in detail.
+
 # DATA from UK Biobank
 
 The phenotype data in UK Biobank has already been partially processed, so it is different from the way we process our own data. See the `README_UKB.md` for detail.
